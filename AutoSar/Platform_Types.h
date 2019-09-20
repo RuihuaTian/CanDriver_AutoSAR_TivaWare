@@ -2,7 +2,7 @@
  * Platform_Types.h
  *
  *  Created on: Aug 28, 2019
- *      Author: r
+ *      Author: Sad MultiVerse
  */
 
 #ifndef PLATFORM_TYPES_H_

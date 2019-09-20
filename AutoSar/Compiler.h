@@ -2,7 +2,7 @@
  * Compiler.h
  *
  *  Created on: Aug 28, 2019
- *      Author: r
+ *      Author: Sad MultiVerse
  */
 
 #ifndef COMPILER_H_

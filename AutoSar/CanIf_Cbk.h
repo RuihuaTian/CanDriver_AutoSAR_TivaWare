@@ -2,7 +2,7 @@
  * CanIf_Cbk.h
  *
  *  Created on: Sep 20, 2019
- *      Author: r
+ *      Author: Sad MultiVerse
  */
 
 #ifndef CANIF_CBK_H_

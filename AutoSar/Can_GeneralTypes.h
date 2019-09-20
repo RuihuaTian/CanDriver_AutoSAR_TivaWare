@@ -2,7 +2,7 @@
  * Can_GeneralTypes.h
  *
  *  Created on: Sep 20, 2019
- *      Author: r
+ *      Author: Sad MultiVerse
  */
 
 #ifndef CAN_GENERALTYPES_H_
