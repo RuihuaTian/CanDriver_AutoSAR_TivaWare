@@ -102,3 +102,47 @@ Std_ReturnType Can_Write (
 
 	return E_OK ;
 }
+
+
+
+
+/*---------------------------------------------------------------------
+Function Name:  <Can_MainFunction_Mode>
+Service ID:     <0x0c>
+Description:
+- Scheduled function.
+- This function performs the polling of CAN controller mode transitions.
+- it implements the polling of CAN status register flags to detect transition of CAN Controller state.
+----------------------------------------------------------------------*/
+void Can_MainFunction_Mode( void )
+{
+    uint8 ControllerIndex;
+    uint32 ui32Base;
+
+    for (ControllerIndex = 0 ; ControllerIndex < CONFIGURED_CHANNELS ; ControllerIndex++  )
+    {
+        switch (ControllerIndex)
+        {
+        case 0: ui32Base = CAN0_BASE ;break;
+        case 1: ui32Base = CAN1_BASE ;break;
+        }
+
+        if (HWREG(ui32Base +CAN_O_CTR) & CAN_CTL_INIT)
+        {
+            if (ControllerMode == CAN_CS_SLEEP)
+            {
+                CanIf_ControllerModeIndication(ControllerIndex,CAN_CS_SLEEP);
+            }
+            else
+            {
+                CanIf_ControllerModeIndication(ControllerIndex,CAN_CS_STOPPED);
+            }
+        }
+        else
+        {
+            CanIf_ControllerModeIndication(ControllerIndex,CAN_CS_STARTED);
+        }
+    }
+
+}
+

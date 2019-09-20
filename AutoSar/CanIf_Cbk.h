@@ -10,4 +10,9 @@
 
 
 
+
+
+void CanIf_ControllerModeIndication( uint8 ControllerId, Can_ControllerStateType ControllerMode );
+
+
 #endif /* CANIF_CBK_H_ */

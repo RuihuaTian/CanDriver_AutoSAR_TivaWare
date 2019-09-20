@@ -9,10 +9,12 @@
 #define COMPILER_H_
 
 
-#define STATIC 			static
-#define INLINE			inline
-
-
+#define AUTOMATIC
+#define TYPEDEF
+#define INLINE            inline
+#define NULL_PTR          ((void *)0)
+#define STATIC            static
+#define LOCAL_INLINE      static inline
 
 
 #endif /* COMPILER_H_ */
