@@ -36,6 +36,12 @@ STATIC Can_HwType MsgObject [MAX_NO_OF_OBJECTS] ;
 	but if init function did its job we can use it from the configurations itself
 */
 STATIC Can_ConfigType * g_Config_Ptr ;
+STATIC uint8 Can_DriverState =  CAN_INITIALIZED ;						/// assume that init function has initialized it !
+
+uint8 HTH_Semaphore = 0 ;
+
+
+
 
 Std_ReturnType Can_Write (
 
@@ -47,60 +53,119 @@ Std_ReturnType Can_Write (
 	Std_ReturnType returnVal = E_OK ;
 
 
-	uint8 index ;
-
-	uint32_t 		uiBase ;
-	uint32_t 		ui32ObjID ;
-	tCANMsgObject *	psMsgObject ;
-	tMsgObjType 	eMsgType ;
-
-	/*
-	 * choosing what can controller ..
-	 */
-
-	for (index = 0 ; index < MAX_NO_OF_OBJECTS ; index++ )
+#if (CanDevErrorDetect == FALSE)
+	if (Can_DriverState == CAN_NOT_INITIALIZED)
 	{
-		if (g_Config_Ptr->HardWareObject[index].CanObjectId == Hth )
-		{
-			switch (g_Config_Ptr->HardWareObject[index].CanContrlloerRef)
-			{
-				case 0 : uiBase = CAN0_BASE ; break ;
-				case 1 : uiBase = CAN1_BASE ; break ;
-			}
-		}
+		//// call the DET function .. CAN_E_UNIT
+		returnVal = E_NOT_OK ;
 	}
 
-	/*
-	 * Message Object Id
-	 */
+	else if (Hth > 64)
+	{
+		//// call the DET .... CAN_E_PARAM_HANDLE
+		returnVal = E_NOT_OK ;
+	}
+	else if (PduInfo == NULL_PTR)
+		{
+			//// call the DET .... CAN_E_PARAM_POINTER
+			returnVal = E_NOT_OK ;
+		}
+	else if (PduInfo->length > 64)
+		{
+			//// call the DET .... CAN_E_PARAM_DATA_LENGTH
+			returnVal = E_NOT_OK ;
+		}
+	else
 
-	ui32ObjID = Hth ;
+#endif
+	{
 
+		uint8 index ;
 
-	/*
-	 * PDU .. message object itself
-	 */
-	psMsgObject->ui32MsgID = PduInfo->id ;
-	psMsgObject->ui32MsgLen = PduInfo->length ;
-	psMsgObject->pui8MsgData = PduInfo->sdu ;
-	psMsgObject->ui32Flags = 0;									/// don't forget me
-	psMsgObject->ui32MsgIDMask = 0 ;							// and me .. or you just can delete us from Tivaware itself, if you don't love us anymore !
-
-
-	/*
-	 * the type of the CAN_write () function is obviously Tx
-	 */
-	eMsgType = MSG_OBJ_TYPE_TX ;
-
-	/*
-	 * call the Tivaware function now !
-	 */
-	CANMessageSet( uiBase , ui32ObjID, psMsgObject, eMsgType  );
-
-
+		uint32_t 		uiBase ;
+		uint32_t 		ui32ObjID ;
+		tCANMsgObject *	psMsgObject ;
+		tMsgObjType 	eMsgType ;
 
 
-	return E_OK ;
+		if (HTH_Semaphore == 0 ) 					//// 0 : no one uses it at the moment !
+
+		{
+			///// start protecting your shared stuff man !
+			HTH_Semaphore = 1 ;											//// acquire me
+
+			/*
+			 * choosing what can controller .. to detect what is the base address
+			 */
+
+			for (index = 0 ; index < MAX_NO_OF_OBJECTS ; index++ )
+			{
+				if (g_Config_Ptr->HardWareObject[index].CanObjectId == Hth )
+				{
+					switch (g_Config_Ptr->HardWareObject[index].CanContrlloerRef)
+					{
+						case 0 : uiBase = CAN0_BASE ; break ;
+						case 1 : uiBase = CAN1_BASE ; break ;
+					}
+				}
+			}
+
+			/*
+			 * Message Object Id
+			 */
+
+			ui32ObjID = Hth ;
+
+			/*
+			 * PDU .. message object itself
+			 */
+			psMsgObject->ui32MsgID = PduInfo->id ;
+			psMsgObject->ui32MsgLen = PduInfo->length ;
+			psMsgObject->pui8MsgData = PduInfo->sdu ;
+			psMsgObject->ui32Flags = 0;									/// don't forget me
+			psMsgObject->ui32MsgIDMask = 0 ;							// and me .. or you just can delete us from Tivaware itself, if you don't love us anymore !
+
+
+			/*
+			 * the type of the CAN_write () function is obviously Tx
+			 */
+			eMsgType = MSG_OBJ_TYPE_TX ;
+
+
+			/////// stop protecting your stuff man !
+			HTH_Semaphore = 0 ; 											//// release me
+
+			/*
+			 * check if the controller is busy
+			 */
+
+			if (HWREG(uiBase + CAN_O_IF1CRQ) & CAN_IF1CRQ_BUSY)
+			{
+				returnVal = CAN_BUSY ;
+			}
+
+			else {
+
+				/*
+				 *
+				 * call the Tivaware function now !
+				 */
+				CANMessageSet( uiBase , ui32ObjID, psMsgObject, eMsgType  );
+				returnVal = E_OK ;
+
+			}
+
+		}
+		else															/////// CAN Is busy
+		{
+			returnVal = CAN_BUSY ;
+		}
+
+
+
+	}
+
+	return returnVal ;
 }
 
 

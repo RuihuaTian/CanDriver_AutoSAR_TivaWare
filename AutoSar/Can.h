@@ -19,6 +19,9 @@
 #define MAX_NO_OF_OBJECTS 			(32u)
 #define NO_OF_CONTROLLERS_IN_HW 	(2u)
 
+#define CAN_INITIALIZED 			(1u)
+#define CAN_NOT_INITIALIZED 			(0u)
+
 typedef uint8 Can_ReturnType ;			/// it takes a CAN_BUSY value
 typedef uint8 CanControllerIdType ;
 
