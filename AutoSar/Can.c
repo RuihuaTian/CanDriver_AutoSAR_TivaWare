@@ -107,6 +107,9 @@ Std_ReturnType Can_Write (
 						case 0 : uiBase = CAN0_BASE ; break ;
 						case 1 : uiBase = CAN1_BASE ; break ;
 					}
+
+					psMsgObject->ui32Flags = ( g_Config_Ptr->HardWareObject[index].CanIdType == STANDARD )? MSG_OBJ_NO_FLAGS : MSG_OBJ_EXTENDED_ID ; /// flags are not handled in this Api except for stand vs extend
+
 				}
 			}
 
@@ -122,8 +125,7 @@ Std_ReturnType Can_Write (
 			psMsgObject->ui32MsgID = PduInfo->id ;
 			psMsgObject->ui32MsgLen = PduInfo->length ;
 			psMsgObject->pui8MsgData = PduInfo->sdu ;
-			psMsgObject->ui32Flags = 0;									/// don't forget me
-			psMsgObject->ui32MsgIDMask = 0 ;							// and me .. or you just can delete us from Tivaware itself, if you don't love us anymore !
+			psMsgObject->ui32MsgIDMask = 0 ;							//  no filtering mode .. maybe later
 
 
 			/*
@@ -184,19 +186,20 @@ void Can_MainFunction_Mode( void )
     uint8 ControllerIndex;
     uint32 ui32Base;
 
-    for (ControllerIndex = 0 ; ControllerIndex < CONFIGURED_CHANNELS ; ControllerIndex++  )
+
+    for (ControllerIndex = 0 ; ControllerIndex < NO_OF_CONTROLLERS_IN_HW  ; ControllerIndex++  )
     {
         switch (ControllerIndex)
         {
-        case 0: ui32Base = CAN0_BASE ;break;
-        case 1: ui32Base = CAN1_BASE ;break;
+			case 0: ui32Base = CAN0_BASE ;break;
+			case 1: ui32Base = CAN1_BASE ;break;
         }
 
-        if (HWREG(ui32Base +CAN_O_CTR) & CAN_CTL_INIT)
+        if (HWREG(ui32Base + CAN_O_CTL) & CAN_CTL_INIT)								////// the controller is in intialization state
         {
-            if (ControllerMode == CAN_CS_SLEEP)
+            if (g_Config_Ptr->CanControllers[ControllerIndex].ControllerStatus == CAN_CS_SLEEP)
             {
-                CanIf_ControllerModeIndication(ControllerIndex,CAN_CS_SLEEP);
+                CanIf_ControllerModeIndication(ControllerIndex,CAN_CS_SLEEP);				/// callback function
             }
             else
             {
@@ -205,7 +208,11 @@ void Can_MainFunction_Mode( void )
         }
         else
         {
-            CanIf_ControllerModeIndication(ControllerIndex,CAN_CS_STARTED);
+        	if (g_Config_Ptr->CanControllers[ControllerIndex].CanControllerErrorState == CAN_ERRORSTARE_BUSOFF )
+        		CanIf_ControllerModeIndication(ControllerIndex,CAN_CS_UINIT);
+
+        	else
+        		CanIf_ControllerModeIndication(ControllerIndex,CAN_CS_STARTED);
         }
     }
 

@@ -63,7 +63,9 @@ typedef struct {
 typedef struct {
 
 
-	CanControllerIdType CanControllerId ;
+	CanControllerIdType 		CanControllerId ;
+	Can_ControllerStateType 	ControllerStatus ;
+	Can_ErrorStateType 			CanControllerErrorState ;
 
 
 }CanControllerType ;
@@ -72,7 +74,7 @@ typedef struct {
 typedef struct {
 
 
-	CanControllerType 		CanController[NO_OF_CONTROLLERS_IN_HW] ;
+	CanControllerType		CanControllers [NO_OF_CONTROLLERS_IN_HW] ;
 	CanHardwareObjectType	HardWareObject[MAX_NO_OF_OBJECTS] ;
 
 
