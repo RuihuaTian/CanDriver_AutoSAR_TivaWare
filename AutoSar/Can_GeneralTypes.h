@@ -19,11 +19,11 @@ typedef struct {
 
 
 	pduIdType 	swPduHandle ;
-	uint8 		length ;
+	uint8 		length ;			/// obviously the length of the data
 	Can_IdType	id ;				/// ambiguous type of message id
-	uint8 * 	sdu ;
+	uint8 * 	sdu ;				/// the data itself
 
-}can_PduType ;
+}Can_PduType ;
 
 
 /*
