@@ -53,7 +53,7 @@ Std_ReturnType Can_Write (
 	Std_ReturnType returnVal = E_OK ;
 
 
-#if (CanDevErrorDetect == FALSE)
+#if (CanDevErrorDetect == TRUE)
 	if (Can_DriverState == CAN_NOT_INITIALIZED)
 	{
 		//// call the DET function .. CAN_E_UNIT
