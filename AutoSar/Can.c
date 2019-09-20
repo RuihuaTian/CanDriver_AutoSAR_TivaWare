@@ -98,6 +98,7 @@ Std_ReturnType Can_Write (
 			 * choosing what can controller .. to detect what is the base address
 			 */
 
+			/*
 			for (index = 0 ; index < MAX_NO_OF_OBJECTS ; index++ )
 			{
 				if (g_Config_Ptr->HardWareObject[index].CanObjectId == Hth )
@@ -112,12 +113,22 @@ Std_ReturnType Can_Write (
 
 				}
 			}
+*/
 
-			/*
-			 * Message Object Id
-			 */
+			/////// another method
 
-			ui32ObjID = Hth ;
+			if (Hth > 32)
+			{
+				uiBase = CAN1_BASE ;
+				ui32ObjID = Hth - 32 ;
+			}
+			else
+			{
+				uiBase = CAN0_BASE ;
+				ui32ObjID = Hth ;
+			}
+
+			psMsgObject->ui32Flags = ( g_Config_Ptr->HardWareObject[Hth].CanIdType == STANDARD )? MSG_OBJ_NO_FLAGS : MSG_OBJ_EXTENDED_ID ;
 
 			/*
 			 * PDU .. message object itself
