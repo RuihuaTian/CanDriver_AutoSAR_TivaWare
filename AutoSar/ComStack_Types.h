@@ -24,4 +24,6 @@ typedef struct {
 
 }PduInfoType;
 
+
+
 #endif /* COMSTACK_TYPES_H_ */
