@@ -83,6 +83,10 @@ typedef struct {
 
 
 
+extern const Can_ConfigType Can_Configurations ;
+
+
+
 
 Std_ReturnType Can_Write (
 

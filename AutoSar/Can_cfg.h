@@ -14,11 +14,14 @@
 
 
 
-
 #define CanBusoffProcessing 	INTERRUPT_MODE
 #define CanControllerActivation
 #define CanControllerBaseAddress
 #define CanController
+
+
+#define CAN0_ID				(0u)
+#define CAN1_ID				(1u)
 
 
 

@@ -38,7 +38,10 @@ STATIC Can_HwType MsgObject [MAX_NO_OF_OBJECTS] ;
 STATIC Can_ConfigType * g_Config_Ptr ;
 STATIC uint8 Can_DriverState =  CAN_INITIALIZED ;						/// assume that init function has initialized it !
 
-uint8 HTH_Semaphore = 0 ;
+STATIC PduIdType 	Saved_swPduHandle ;
+
+uint8 HTH_Semaphore = 0 ;												//// simulation of a semaphore by a sad global variable to protect HTH
+
 
 
 
@@ -52,7 +55,9 @@ Std_ReturnType Can_Write (
 
 	Std_ReturnType returnVal = E_OK ;
 
-
+/*
+ * check if you left the DevErrorDectect Open ..
+ */
 #if (CanDevErrorDetect == TRUE)
 	if (Can_DriverState == CAN_NOT_INITIALIZED)
 	{
@@ -80,7 +85,9 @@ Std_ReturnType Can_Write (
 #endif
 	{
 
-		uint8 index ;
+		/*
+		 * if every thing went well after the error detection .. prepare the parameters of CanMessageSet() [search for it]
+		 */
 
 		uint32_t 		uiBase ;
 		uint32_t 		ui32ObjID ;
@@ -115,7 +122,11 @@ Std_ReturnType Can_Write (
 			}
 */
 
-			/////// another method
+			/*
+			 * another method to decide what can controller to use.
+			 * if the argument HTH is bigger that 32 .. CAN0 .. else CAN1
+			 * and assign the message object id with a proper value
+			 */
 
 			if (Hth > 32)
 			{
@@ -128,19 +139,27 @@ Std_ReturnType Can_Write (
 				ui32ObjID = Hth ;
 			}
 
+			/// what is the type of the message id ?
+
 			psMsgObject->ui32Flags = ( g_Config_Ptr->HardWareObject[Hth].CanIdType == STANDARD )? MSG_OBJ_NO_FLAGS : MSG_OBJ_EXTENDED_ID ;
+
+			// also from the can_id_type itself
+/*
+			psMsgObject->ui32Flags = (PduInfo->id & (1<<31))?  MSG_OBJ_EXTENDED_ID  : MSG_OBJ_NO_FLAGS  ;			check the most significant bit
+*/
 
 			/*
 			 * PDU .. message object itself
 			 */
-			psMsgObject->ui32MsgID = PduInfo->id ;
+
+			psMsgObject->ui32MsgID =  (PduInfo->id & (1<<31) )? ( PduInfo->id & 0x1fffffff ) : ( PduInfo->id & 0x07FF )  ;				//// 11 bits or 29 bits to go
 			psMsgObject->ui32MsgLen = PduInfo->length ;
 			psMsgObject->pui8MsgData = PduInfo->sdu ;
 			psMsgObject->ui32MsgIDMask = 0 ;							//  no filtering mode .. maybe later
 
 
 			/*
-			 * the type of the CAN_write () function is obviously Tx
+			 * the type of the CAN_write() function is obviously Tx
 			 */
 			eMsgType = MSG_OBJ_TYPE_TX ;
 
@@ -164,6 +183,7 @@ Std_ReturnType Can_Write (
 				 * call the Tivaware function now !
 				 */
 				CANMessageSet( uiBase , ui32ObjID, psMsgObject, eMsgType  );
+				Saved_swPduHandle = PduInfo->swPduHandle ;
 				returnVal = E_OK ;
 
 			}

@@ -8,7 +8,7 @@
 #ifndef CAN_GENERALTYPES_H_
 #define CAN_GENERALTYPES_H_
 
-
+#include "ComStack_Types.h"
 
 typedef uint32 	Can_IdType ; 			// ambiguous type of message Id
 typedef uint8 Can_HwHandleType;			// hardware object of can hw unit ---- message object id i think
@@ -18,7 +18,7 @@ typedef uint8 Can_HwHandleType;			// hardware object of can hw unit ---- message
 typedef struct {
 
 
-	pduIdType 	swPduHandle ;
+	PduIdType 	swPduHandle ;
 	uint8 		length ;			/// obviously the length of the data
 	Can_IdType	id ;				/// ambiguous type of message id
 	uint8 * 	sdu ;				/// the data itself
