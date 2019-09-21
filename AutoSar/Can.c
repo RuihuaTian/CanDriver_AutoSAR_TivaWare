@@ -183,7 +183,7 @@ Std_ReturnType Can_Write (
 				 * call the Tivaware function now !
 				 */
 				CANMessageSet( uiBase , ui32ObjID, psMsgObject, eMsgType  );
-				Saved_swPduHandle = PduInfo->swPduHandle ;
+				Saved_swPduHandle = PduInfo->swPduHandle ;						//// save the
 				returnVal = E_OK ;
 
 			}
