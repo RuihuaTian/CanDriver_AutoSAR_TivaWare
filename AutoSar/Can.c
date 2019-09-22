@@ -161,9 +161,6 @@ Std_ReturnType Can_Write (
 			eMsgType = MSG_OBJ_TYPE_TX ;
 
 
-			/////// stop protecting your stuff man !
-			HTH_Semaphore[Hth] = 0 ; 											//// release me
-
 			/*
 			 * check if the controller is busy
 			 */
@@ -184,6 +181,10 @@ Std_ReturnType Can_Write (
 				returnVal = E_OK ;
 
 			}
+
+			/////// stop protecting your stuff man !
+			HTH_Semaphore[Hth] = 0 ; 											//// release me
+
 
 		}
 		else															/////// CAN Is busy
