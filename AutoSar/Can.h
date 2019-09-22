@@ -16,7 +16,7 @@
 #include "Can_cfg.h"
 
 
-#define MAX_NO_OF_OBJECTS 			(64u)
+#define MAX_NO_OF_OBJECTS 			(65u)
 #define NO_OF_CONTROLLERS_IN_HW 	(2u)
 
 #define CAN_INITIALIZED 			(1u)

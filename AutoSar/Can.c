@@ -40,10 +40,7 @@ STATIC uint8 Can_DriverState =  CAN_INITIALIZED ;						/// assume that init func
 
 STATIC PduIdType 	Saved_swPduHandle ;
 
-uint8 HTH_Semaphore = 0 ;												//// simulation of a semaphore by a sad global variable to protect HTH
-
-
-
+uint8 HTH_Semaphore[MAX_NO_OF_OBJECTS] = 0 ;							//// simulation of a semaphore by a sad global variable to protect HTH or generally all tha HOH
 
 
 Std_ReturnType Can_Write (
@@ -95,11 +92,11 @@ Std_ReturnType Can_Write (
 		tMsgObjType 	eMsgType ;
 
 
-		if (HTH_Semaphore == 0 ) 					//// 0 : no one uses it at the moment !
+		if (HTH_Semaphore[Hth] == 0 ) 					//// 0 : no one uses it at the moment !
 
 		{
 			///// start protecting your shared stuff man !
-			HTH_Semaphore = 1 ;											//// acquire me
+			HTH_Semaphore[Hth] = 1 ;											//// acquire me
 
 			/*
 			 * choosing what can controller .. to detect what is the base address
@@ -165,7 +162,7 @@ Std_ReturnType Can_Write (
 
 
 			/////// stop protecting your stuff man !
-			HTH_Semaphore = 0 ; 											//// release me
+			HTH_Semaphore[Hth] = 0 ; 											//// release me
 
 			/*
 			 * check if the controller is busy
